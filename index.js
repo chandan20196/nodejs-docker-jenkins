@@ -1,13 +1,13 @@
-var express = require('express')
-var app = express()
+const express = require('express');
+const app = express();
 
-app.set('port', (process.env.PORT || 5000))
-app.use(express.static(__dirname + '/public'))
+const port = process.env.PORT || 3000; // Use env PORT if set, else 3000
 
-app.get('/', function(request, response) {
-  response.send('Hello World!')
-})
+app.get('/', (req, res) => {
+  res.send('Hello from NodeJS!');
+});
 
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'))
-})
+// Bind to 0.0.0.0 so Docker exposes it
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});

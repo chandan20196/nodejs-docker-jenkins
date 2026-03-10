@@ -1,20 +1,18 @@
+# Use NodeJS latest Alpine image
+FROM node:18-alpine
 
-FROM node:20-alpine
-
-LABEL maintainer="chandan"
-
+# Set working directory
 WORKDIR /app
 
+# Copy package.json and install dependencies
 COPY package*.json ./
-
 RUN npm install
 
-ADD . .
+# Copy all app files
+COPY . .
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-USER appuser
-
+# Expose port
 EXPOSE 3000
 
-CMD ["node","server.js"]
+# Start app
+CMD ["node", "index.js"]
