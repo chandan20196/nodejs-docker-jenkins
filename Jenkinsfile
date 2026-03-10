@@ -17,13 +17,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t montisa/chandan-nodejs-demo1212:latest .'
+                sh 'docker build -t chandan20196/nodejs-app .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push montisa/chandan-nodejs-demo1212:latest'
+                sh 'docker push chandan20196/nodejs-app'
             }
         }
 
