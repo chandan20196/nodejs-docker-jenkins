@@ -2,50 +2,42 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_NAME = 'montisa/chandan-nodejs-demo1212'
-        PORT = '3000'
+        DOCKER_IMAGE = "montisa/chandan-nodejs-demo1212"
+        DOCKER_TAG = "latest"
     }
 
     stages {
-        stage('Clone Repo') {
+
+        stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/<your-nodejs-repo>.git'
+                git 'https://github.com/chandan20196/nodejs-docker-jenkins.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t node-app .'
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
-        stage('Tag Docker Image') {
+        stage('Docker Login') {
             steps {
-                sh "docker tag node-app ${IMAGE_NAME}:latest"
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh "docker push ${IMAGE_NAME}:latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Push Image to DockerHub') {
             steps {
-                sh 'docker stop node-app || true'
-                sh 'docker rm node-app || true'
-                sh "docker run -d -p ${PORT}:${PORT} --name node-app ${IMAGE_NAME}:latest"
+                sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
             }
         }
-    }
-
-    post {
-        success { echo 'Pipeline completed successfully!' }
-        failure { echo 'Pipeline failed. Check logs!' }
     }
 }
